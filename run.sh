@@ -6,17 +6,21 @@ mempool=0
 size=1586
 time=`date +%s`
 totaltx=1
-ac="TXSCL002"
+acbase="TXSCL00"
 ttl=$((time+50))
-RESULT="{\"size\": ${size}, \"height\": ${height}, \"time\": ${time}, \"totaltx\": 1, \"ac\": \"${ac}\", \"ttl\": ${ttl}, \"mempoolMB\": ${mempool}}"
-echo ${RESULT}
+#RESULT="{\"size\": ${size}, \"height\": ${height}, \"time\": ${time}, \"totaltx\": 1, \"ac\": \"${ac}\", \"ttl\": ${ttl}, \"mempoolMB\": ${mempool}}"
 echo ${BLOCKNOTIFYURL}
 sleep 1
 for i in `seq 1 64`;
 do
-  echo `"obase=16; ${i}" | bc`
-done
-# exit
+  CHAIN=`echo "obase=16;  ${i}" | bc`
+  if [ ${i} -lt 16 ]
+  then
+    ac="${acbase}0"
+  else
+    ac="${acbase}"
+  fi
+  CHAIN=${ac}${CHAIN}
 if [ $STATS -eq 1 ]
   then
     # echo $RESULT >> ${STATS_FILE}
@@ -27,14 +31,17 @@ if [ $STATS -eq 1 ]
     --header 'Origin: http://localhost:8000' \
     --header 'Access-Control-Request-Headers: Origin, Accept, Content-Type' \
     --header 'Access-Control-Request-Method: POST'
-    sleep 2
+    sleep 0.5
     curl \
     --verbose \
     --header "Origin: http://localhost:8000" \
     --request POST \
-    -d "{ \"size\": ${size}, \"height\": ${height}, \"time\": ${time}, \"totaltx\": 1, \"ac\": \"${ac}\", \"ttl\": ${ttl}, \"mempoolMB\": ${mempool}}" \
+    -d "{ \"size\": ${size}, \"height\": ${height}, \"time\": ${time}, \"totaltx\": 1, \"ac\": \"${CHAIN}\", \"ttl\": ${ttl}, \"mempoolMB\": ${mempool}}" \
     ${BLOCKNOTIFYURL} #&
+    echo "{ \"size\": ${size}, \"height\": ${height}, \"time\": ${time}, \"totaltx\": 1, \"ac\": \"${CHAIN}\", \"ttl\": ${ttl}, \"mempoolMB\": ${mempool}}"
+    sleep 3 
 fi
+done
 
 # { "size": 1586, "height": 1, "time": 1531219771, "totaltx": 1, "ac": "TXSCL002", "ttl": 1531219837, "mempoolMB": 0 }
 # { "size": 1586, "height": 2, "time": 1531219811, "totaltx": 1, "ac": "TXSCL002", "ttl": 1531219852, "mempoolMB": 0 }
