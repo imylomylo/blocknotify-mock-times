@@ -16,7 +16,7 @@ for i in `seq 1 64`;
 do
   echo `"obase=16; ${i}" | bc`
 done
-exit
+# exit
 if [ $STATS -eq 1 ]
   then
     # echo $RESULT >> ${STATS_FILE}
@@ -32,7 +32,7 @@ if [ $STATS -eq 1 ]
     --verbose \
     --header "Origin: http://localhost:8000" \
     --request POST \
-    --data "{ \"size\": ${size}, \"height\": ${height}, \"time\": ${time}, \"totaltx\": 1, \"ac\": \"${ac}\", \"ttl\": ${ttl}, \"mempoolMB\": ${mempool}}" \
+    -d "{ \"size\": ${size}, \"height\": ${height}, \"time\": ${time}, \"totaltx\": 1, \"ac\": \"${ac}\", \"ttl\": ${ttl}, \"mempoolMB\": ${mempool}}" \
     ${BLOCKNOTIFYURL} #&
 fi
 
