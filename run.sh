@@ -1,13 +1,25 @@
+#!/bin/bash
+BLOCKNOTIFYURL=https://njeitldkqc.execute-api.ap-southeast-2.amazonaws.com/v0/blocknotify
+STATS=1
+height=1
+mempool=0
+size=1586
+time=`date +%s`
+totaltx=1
+ac="TXSCL002"
+ttl=$((time+50))
+RESULT="{\"size\": ${size}, \"height\": ${height}, \"time\": ${time}, \"totaltx\": 1, \"ac\": \"${ac}\", \"ttl\": ${ttl}, \"mempoolMB\": ${mempool}}"
+echo ${RESULT}
+echo ${BLOCKNOTIFYURL}
+sleep 1
+for i in `seq 1 64`;
+do
+  echo `"obase=16; ${i}" | bc`
+done
+exit
 if [ $STATS -eq 1 ]
   then
-    block=$(komodo-cli -ac_name=$chain getblock $HEIGHT)
-    mempool=$(komodo-cli -ac_name=$chain getmempoolinfo)
-    blockinfo=$(echo $block | jq '{size, height, time}')
-    totaltx=$(echo $block | jq '.tx | length')
-    ttl=$(date -d '+30 seconds' +%s)
-    mempoolMB=$(( $(echo $mempool | jq -r .bytes) / 1000000 ))
-    RESULT=$(echo $blockinfo | jq --argjson ttl $ttl --argjson mempoolMB $mempoolMB --argjson totaltx $totaltx --arg chain $chain '. += {"totaltx":$totaltx, "ac":$chain, "ttl":$ttl, "mempoolMB":$mempoolMB}')
-    echo $RESULT >> ${STATS_FILE}
+    # echo $RESULT >> ${STATS_FILE}
     curl \
     --verbose \
     --request OPTIONS \
@@ -20,8 +32,8 @@ if [ $STATS -eq 1 ]
     --verbose \
     --header "Origin: http://localhost:8000" \
     --request POST \
-    --data "${RESULT}" \
-    ${BLOCKNOTIFYURL} &
+    --data "{ \"size\": ${size}, \"height\": ${height}, \"time\": ${time}, \"totaltx\": 1, \"ac\": \"${ac}\", \"ttl\": ${ttl}, \"mempoolMB\": ${mempool}}" \
+    ${BLOCKNOTIFYURL} #&
 fi
 
 # { "size": 1586, "height": 1, "time": 1531219771, "totaltx": 1, "ac": "TXSCL002", "ttl": 1531219837, "mempoolMB": 0 }
